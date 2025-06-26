@@ -72,6 +72,7 @@ async function sendRedisEvent(
         instance: instanceName || 'global'
       }
     );
+    console.log(`Event sent to Redis Stream: ${finalStreamName}, ID: ${eventId}`);
 
     // 6. REGISTRO NO CACHE APÓS SUCESSO
     addToCache(messageHash);

@@ -1036,6 +1036,7 @@ export class BaileysStartupService extends ChannelStartupService {
     ) => {
       try {
         for (const received of messages) {
+          console.log('-----------------------Received message:', received);
           const result = await sendRedisEvent(
             'messages.upsert',
             received,
