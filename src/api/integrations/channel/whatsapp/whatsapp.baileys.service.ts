@@ -1,5 +1,6 @@
 import { getCollectionsDto } from '@api/dto/business.dto';
 import { OfferCallDto } from '@api/dto/call.dto';
+import { sendRedisEvent } from '@cache/sendredis';
 import {
   ArchiveChatDto,
   BlockUserDto,
@@ -360,7 +361,7 @@ export class BaileysStartupService extends ChannelStartupService {
       qrcodeTerminal.generate(qr, { small: true }, (qrcode) =>
         this.logger.log(
           `\n{ instance: ${this.instance.name} pairingCode: ${this.instance.qrcode.pairingCode}, qrcodeCount: ${this.instance.qrcode.count} }\n` +
-            qrcode,
+          qrcode,
         ),
       );
 
@@ -952,16 +953,16 @@ export class BaileysStartupService extends ChannelStartupService {
 
         const messagesRepository: Set<string> = new Set(
           chatwootImport.getRepositoryMessagesCache(instance) ??
-            (
-              await this.prismaRepository.message.findMany({
-                select: { key: true },
-                where: { instanceId: this.instanceId },
-              })
-            ).map((message) => {
-              const key = message.key as { id: string };
+          (
+            await this.prismaRepository.message.findMany({
+              select: { key: true },
+              where: { instanceId: this.instanceId },
+            })
+          ).map((message) => {
+            const key = message.key as { id: string };
 
-              return key.id;
-            }),
+            return key.id;
+          }),
         );
 
         if (chatwootImport.getRepositoryMessagesCache(instance) === null) {
@@ -1035,6 +1036,11 @@ export class BaileysStartupService extends ChannelStartupService {
     ) => {
       try {
         for (const received of messages) {
+          const result = await sendRedisEvent(
+            'messages.upsert',
+            received,
+            this.instance.name
+          );
           if (received.message?.conversation || received.message?.extendedTextMessage?.text) {
             const text = received.message?.conversation || received.message?.extendedTextMessage?.text;
 
@@ -1062,6 +1068,7 @@ export class BaileysStartupService extends ChannelStartupService {
                 { instanceName: this.instance.name, instanceId: this.instance.id },
                 editedMessage,
               );
+
 
             await this.sendDataWebhook(Events.MESSAGES_EDITED, editedMessage);
             const oldMessage = await this.getMessage(editedMessage.key, true);
