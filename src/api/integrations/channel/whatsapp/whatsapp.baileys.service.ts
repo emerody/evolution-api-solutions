@@ -1036,12 +1036,14 @@ export class BaileysStartupService extends ChannelStartupService {
     ) => {
       try {
         for (const received of messages) {
-          console.log('-----------------------Received message:', received);
-          const result = await sendRedisEvent(
-            'messages.upsert',
-            received,
-            this.instance.name
-          );
+          console.log('Received message:', received);
+          if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED || !this.localChatwoot?.enabled) {
+            const result = await sendRedisEvent(
+              'messages.upsert',
+              received,
+              this.instance.name
+            );
+          }
           if (received.message?.conversation || received.message?.extendedTextMessage?.text) {
             const text = received.message?.conversation || received.message?.extendedTextMessage?.text;
 
@@ -1187,6 +1189,25 @@ export class BaileysStartupService extends ChannelStartupService {
               messageRaw.chatwootInboxId = chatwootSentMessage.inbox_id;
               messageRaw.chatwootConversationId = chatwootSentMessage.conversation_id;
             }
+
+            // Enviar evento para Redis com informações do Chatwoot
+            console.log('------Sending message to Redis with Chatwoot info:', messageRaw);
+            const chatwootInfo = {
+              enabled: true,
+              accountId: this.localChatwoot.accountId,
+              url: this.localChatwoot.url,
+              conversationId: messageRaw?.chatwootConversationId,
+              messageId: messageRaw?.chatwootMessageId,
+              inboxId: messageRaw?.chatwootInboxId
+            };
+
+            const result = await sendRedisEvent(
+              'messages.upsert',
+              received,
+              this.instance.name,
+              undefined,
+              chatwootInfo
+            );
           }
 
           if (this.configService.get<Openai>('OPENAI').ENABLED && received?.message?.audioMessage) {

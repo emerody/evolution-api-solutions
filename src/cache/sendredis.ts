@@ -7,6 +7,15 @@ const cacheTimestamps = new Map<string, number>();
 const MAX_CACHE_SIZE = 10000;
 const CACHE_TTL = 300000; // 5 minutos
 
+interface ChatwootInfo {
+  enabled?: boolean;
+  accountId?: string;
+  url?: string;
+  conversationId?: string;
+  messageId?: string;
+  inboxId?: string;
+}
+
 /**
  * Função para enviar eventos ao Redis Stream com deduplicação e proteção contra nulos
  * Segue o padrão da Evolution API - NUNCA lança erros, apenas retorna status
@@ -15,7 +24,8 @@ async function sendRedisEvent(
   eventType: string,
   data: any,
   instanceName?: string,
-  streamName?: string
+  streamName?: string,
+  chatwootInfo?: ChatwootInfo
 ): Promise<{
   success: boolean;
   reason: string;
@@ -26,6 +36,7 @@ async function sendRedisEvent(
     // Pega o nome da stream do .env ou usa valor padrão
     const defaultStreamName = process.env.REDIS_STREAM || 'evolution:events';
     const finalStreamName = streamName || defaultStreamName;
+    
     // 1. VALIDAÇÃO RIGOROSA DE NULOS/UNDEFINED
     const validation = validateInput(eventType, data);
     if (!validation.isValid) {
@@ -52,7 +63,26 @@ async function sendRedisEvent(
       };
     }
 
-    // 5. ENVIO PARA REDIS STREAM - CORREÇÃO AQUI
+    // 5. PREPARAÇÃO DO PAYLOAD COM INFORMAÇÕES DO CHATWOOT
+    const eventPayload: any = {
+      type: eventType,
+      data: serializedData,
+      timestamp: Date.now().toString(),
+      instance: instanceName || 'global'
+    };
+
+    // Adiciona informações do Chatwoot se disponíveis
+    if (chatwootInfo?.enabled && chatwootInfo?.accountId) {
+      eventPayload.chatwoot = {
+        accountId: chatwootInfo.accountId,
+        url: chatwootInfo.url,
+        conversationId: chatwootInfo.conversationId,
+        messageId: chatwootInfo.messageId,
+        inboxId: chatwootInfo.inboxId
+      };
+    }
+
+    // 6. ENVIO PARA REDIS STREAM
     const client = redisClient.getConnection();
     if (!client) {
       return {
@@ -65,16 +95,11 @@ async function sendRedisEvent(
     const eventId = await client.xAdd(
       finalStreamName,
       '*', // ID automático
-      {
-        type: eventType,
-        data: serializedData,
-        timestamp: Date.now().toString(),
-        instance: instanceName || 'global'
-      }
+      eventPayload
     );
     console.log(`Event sent to Redis Stream: ${finalStreamName}, ID: ${eventId}`);
 
-    // 6. REGISTRO NO CACHE APÓS SUCESSO
+    // 7. REGISTRO NO CACHE APÓS SUCESSO
     addToCache(messageHash);
 
     return {
