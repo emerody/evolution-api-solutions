@@ -1036,7 +1036,7 @@ export class BaileysStartupService extends ChannelStartupService {
     ) => {
       try {
         for (const received of messages) {
-          console.log('Received message:', received);
+          this.logger.info('Received message: ' + received );
           if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED || !this.localChatwoot?.enabled) {
             const result = await sendRedisEvent(
               'messages.upsert',
@@ -1191,6 +1191,7 @@ export class BaileysStartupService extends ChannelStartupService {
             }
 
             // Enviar evento para Redis com informações do Chatwoot
+            this.logger.info('-------Sending message to Redis with Chatwoot info');
             console.log('------Sending message to Redis with Chatwoot info:', messageRaw);
             const chatwootInfo = {
               enabled: true,
