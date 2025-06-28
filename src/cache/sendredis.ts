@@ -36,6 +36,8 @@ async function sendRedisEvent(
     // Pega o nome da stream do .env ou usa valor padrão
     const defaultStreamName = process.env.REDIS_STREAM || 'evolution:events';
     const finalStreamName = streamName || defaultStreamName;
+
+    this.logger.info(`Sending event to Redis Stream: ${finalStreamName}, Type: ${eventType}`);
     
     // 1. VALIDAÇÃO RIGOROSA DE NULOS/UNDEFINED
     const validation = validateInput(eventType, data);
