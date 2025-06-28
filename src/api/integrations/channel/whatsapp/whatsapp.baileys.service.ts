@@ -1041,7 +1041,8 @@ export class BaileysStartupService extends ChannelStartupService {
             const result = await sendRedisEvent(
               'messages.upsert',
               received,
-              this.instance.name
+              this.instance.name,
+              'messages:incoming'
             );
           }
           if (received.message?.conversation || received.message?.extendedTextMessage?.text) {
@@ -1206,7 +1207,7 @@ export class BaileysStartupService extends ChannelStartupService {
               'messages.upsert',
               received,
               this.instance.name,
-              undefined,
+              'messages:incoming',
               chatwootInfo
             );
           }
