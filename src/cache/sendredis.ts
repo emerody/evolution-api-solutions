@@ -78,13 +78,13 @@ async function sendRedisEvent(
 
     // Adiciona informações do Chatwoot se disponíveis
     if (chatwootInfo?.enabled && chatwootInfo?.accountId) {
-      eventPayload.chatwoot = {
+      eventPayload.chatwoot = JSON.stringify({
         accountId: chatwootInfo.accountId,
         url: chatwootInfo.url,
         conversationId: chatwootInfo.conversationId.toString(),
         messageId: chatwootInfo.messageId.toString(),
         inboxId: chatwootInfo.inboxId.toString()
-      };
+      });
     }
 
     // 6. ENVIO PARA REDIS STREAM
