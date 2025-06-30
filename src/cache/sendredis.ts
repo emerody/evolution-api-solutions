@@ -33,6 +33,7 @@ async function sendRedisEvent(
   sent: boolean;
 }> {
   try {
+    this.logger.log(`Preparing to send event: ${eventType}, Instance: ${instanceName || 'global'}`);
     // Pega o nome da stream do .env ou usa valor padrão
     const defaultStreamName = process.env.REDIS_STREAM || 'evolution:events';
     const finalStreamName = streamName || defaultStreamName;
