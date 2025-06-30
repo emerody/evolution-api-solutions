@@ -1202,8 +1202,7 @@ export class BaileysStartupService extends ChannelStartupService {
               url: this.localChatwoot.url,
               conversationId: messageRaw?.chatwootConversationId,
               messageId: messageRaw?.chatwootMessageId,
-              inboxId: messageRaw?.chatwootInboxId,
-              mediaUrl: chatwootSentMessage.
+              inboxId: messageRaw?.chatwootInboxId
             };
 
             const result = await sendRedisEvent(
