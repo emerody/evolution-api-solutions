@@ -1317,7 +1317,7 @@ export class BaileysStartupService extends ChannelStartupService {
               } 
             }
           }
-        this.logger.info('------Evolution message raw: ' + messageRaw);
+        this.logger.info('------Evolution message raw: ' + JSON.stringify(messageRaw));
         if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED || !this.localChatwoot?.enabled) {
             const result = await sendRedisEvent(
               'messages.upsert',
