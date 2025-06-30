@@ -1033,20 +1033,9 @@ export class BaileysStartupService extends ChannelStartupService {
     'messages.upsert': async (
       { messages, type, requestId }: { messages: proto.IWebMessageInfo[]; type: MessageUpsertType; requestId?: string },
       settings: any,
-    ) => {
+    ) => {//1
       try {
         for (const received of messages) {
-          this.logger.info('Received message: ' + received);
-          if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED || !this.localChatwoot?.enabled) {
-            const result = await sendRedisEvent(
-              'messages.upsert',
-              received,
-              this.instance.name,
-              'messages:incoming'
-            ).catch((error) => {
-              this.logger.error('Error sending message to Redis: ' + error);
-            });
-          }
           if (received.message?.conversation || received.message?.extendedTextMessage?.text) {
             const text = received.message?.conversation || received.message?.extendedTextMessage?.text;
 
@@ -1206,16 +1195,17 @@ export class BaileysStartupService extends ChannelStartupService {
             };
 
             console.log('------Send chatwoot message:', chatwootInfo);
+            console.log('------Chatwoot message raw:', messageRaw);
             const result = await sendRedisEvent(
               'messages.upsert',
-              received,
+              messageRaw,
               this.instance.name,
               'messages:incoming',
               chatwootInfo
             ).catch((error) => {
               this.logger.error('Error sending message to Redis: ' + error);
             });
-            console.log('------Message sent:', result);
+            console.log('------Chatwoot message called redisMethod:', result);
           }
 
           if (this.configService.get<Openai>('OPENAI').ENABLED && received?.message?.audioMessage) {
@@ -1324,8 +1314,20 @@ export class BaileysStartupService extends ChannelStartupService {
                 }
               } catch (error) {
                 this.logger.error(['Error converting media to base64', error?.message]);
-              }
+              } 
             }
+            this.logger.info('------Evolution message raw: ' + messageRaw);
+          if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED || !this.localChatwoot?.enabled) {
+            const result = await sendRedisEvent(
+              'messages.upsert',
+              messageRaw,
+              this.instance.name,
+              'messages:incoming'
+            ).catch((error) => {
+              this.logger.error('Error sending message to Redis: ' + error);
+            });
+            console.log('------Evolutions message called redisMethod:', result);
+          }
           }
 
           this.logger.log(messageRaw);
