@@ -81,9 +81,9 @@ async function sendRedisEvent(
       eventPayload.chatwoot = {
         accountId: chatwootInfo.accountId,
         url: chatwootInfo.url,
-        conversationId: chatwootInfo.conversationId,
-        messageId: chatwootInfo.messageId,
-        inboxId: chatwootInfo.inboxId
+        conversationId: chatwootInfo.conversationId.toString(),
+        messageId: chatwootInfo.messageId.toString(),
+        inboxId: chatwootInfo.inboxId.toString()
       };
     }
 
