@@ -31,6 +31,7 @@ async function sendRedisEvent(
   reason: string;
   eventId?: string;
   sent: boolean;
+  message?: any;
 }> {
   try {
     this.logger.log(`Preparing to send event: ${eventType}, Instance: ${instanceName || 'global'}`);
@@ -118,7 +119,8 @@ async function sendRedisEvent(
     return {
       success: false,
       reason: 'redis_stream_error',
-      sent: false
+      sent: false,
+      message: error
     };
   }
 }
