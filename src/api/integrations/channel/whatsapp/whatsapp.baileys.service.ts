@@ -1200,7 +1200,7 @@ export class BaileysStartupService extends ChannelStartupService {
               conversationId: messageRaw?.chatwootConversationId,
               messageId: messageRaw?.chatwootMessageId,
               inboxId: messageRaw?.chatwootInboxId,
-              attachments: Array.isArray(chatwootSentMessage?.attachments)
+              dataUrl: Array.isArray(chatwootSentMessage?.attachments)
                 ? chatwootSentMessage.attachments.map((a) => a.data_url)
                 : undefined,
             };
