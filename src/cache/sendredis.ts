@@ -120,7 +120,7 @@ async function sendRedisEvent(
       success: false,
       reason: 'redis_stream_error',
       sent: false,
-      message: error
+      message: error.toString()
     };
   }
 }
