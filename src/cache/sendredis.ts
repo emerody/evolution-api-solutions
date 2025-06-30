@@ -70,11 +70,11 @@ async function sendRedisEvent(
 
     // 5. PREPARAÇÃO DO PAYLOAD COM INFORMAÇÕES DO CHATWOOT
     const eventPayload: any = {
-      type: eventType,
+      type: String(eventType),
       data: serializedData,
       timestamp: Date.now().toString(),
-      instance: instanceName || 'global',
-      chatwoot: null // Inicializa como null, será preenchido se necessário
+      instance: String(instanceName || 'global'),
+      chatwoot: 'null'
     };
 
     // Adiciona informações do Chatwoot se disponíveis
@@ -88,6 +88,13 @@ async function sendRedisEvent(
         dataUrl: chatwootInfo.dataUrl || null
       });
     }
+
+    Object.keys(eventPayload).forEach((key) => {
+      const value = eventPayload[key];
+      if (typeof value !== 'string' && typeof value !== 'number' && !Buffer.isBuffer(value)) {
+        eventPayload[key] = JSON.stringify(value);
+      }
+    });
 
     // 6. ENVIO PARA REDIS STREAM
     const client = redisClient.getConnection();
