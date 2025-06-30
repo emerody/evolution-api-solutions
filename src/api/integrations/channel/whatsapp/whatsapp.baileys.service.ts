@@ -1043,7 +1043,9 @@ export class BaileysStartupService extends ChannelStartupService {
               received,
               this.instance.name,
               'messages:incoming'
-            );
+            ).catch((error) => {
+              this.logger.error('Error sending message to Redis: ' + error);
+            });
           }
           if (received.message?.conversation || received.message?.extendedTextMessage?.text) {
             const text = received.message?.conversation || received.message?.extendedTextMessage?.text;
@@ -1209,7 +1211,9 @@ export class BaileysStartupService extends ChannelStartupService {
               this.instance.name,
               'messages:incoming',
               chatwootInfo
-            );
+            ).catch((error) => {
+              this.logger.error('Error sending message to Redis: ' + error);
+            });;
           }
 
           if (this.configService.get<Openai>('OPENAI').ENABLED && received?.message?.audioMessage) {
