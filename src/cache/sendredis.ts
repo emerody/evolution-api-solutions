@@ -14,6 +14,7 @@ interface ChatwootInfo {
   conversationId?: string;
   messageId?: string;
   inboxId?: string;
+  dataUrl?: any;
 }
 
 /**
@@ -83,7 +84,8 @@ async function sendRedisEvent(
         url: chatwootInfo.url,
         conversationId: chatwootInfo.conversationId,
         messageId: chatwootInfo.messageId,
-        inboxId: chatwootInfo.inboxId
+        inboxId: chatwootInfo.inboxId,
+        dataUrl: chatwootInfo.dataUrl || null
       });
     }
 

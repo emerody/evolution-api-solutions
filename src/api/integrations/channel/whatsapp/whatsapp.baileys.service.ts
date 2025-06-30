@@ -1036,7 +1036,7 @@ export class BaileysStartupService extends ChannelStartupService {
     ) => {
       try {
         for (const received of messages) {
-          this.logger.info('Received message: ' + received );
+          this.logger.info('Received message: ' + received);
           if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED || !this.localChatwoot?.enabled) {
             const result = await sendRedisEvent(
               'messages.upsert',
@@ -1202,7 +1202,10 @@ export class BaileysStartupService extends ChannelStartupService {
               url: this.localChatwoot.url,
               conversationId: messageRaw?.chatwootConversationId,
               messageId: messageRaw?.chatwootMessageId,
-              inboxId: messageRaw?.chatwootInboxId
+              inboxId: messageRaw?.chatwootInboxId,
+              attachments: Array.isArray(chatwootSentMessage?.attachments)
+                ? chatwootSentMessage.attachments.map((a) => a.data_url)
+                : undefined,
             };
 
             const result = await sendRedisEvent(
