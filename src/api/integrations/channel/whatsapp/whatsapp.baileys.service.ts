@@ -1193,9 +1193,6 @@ export class BaileysStartupService extends ChannelStartupService {
               messageRaw.chatwootConversationId = chatwootSentMessage.conversation_id;
             }
 
-            console.log('------Chatwoot message sent:', chatwootSentMessage);
-            // Enviar evento para Redis com informações do Chatwoot
-            console.log('------Sending message to Redis with Chatwoot info:', messageRaw);
             const chatwootInfo = {
               enabled: true,
               accountId: this.localChatwoot.accountId,
@@ -1208,6 +1205,7 @@ export class BaileysStartupService extends ChannelStartupService {
                 : undefined,
             };
 
+            console.log('------Send chatwoot message:', chatwootInfo);
             const result = await sendRedisEvent(
               'messages.upsert',
               received,
