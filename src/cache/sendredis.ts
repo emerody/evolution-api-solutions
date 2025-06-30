@@ -72,7 +72,8 @@ async function sendRedisEvent(
       type: eventType,
       data: serializedData,
       timestamp: Date.now().toString(),
-      instance: instanceName || 'global'
+      instance: instanceName || 'global',
+      chatwoot: null // Inicializa como null, será preenchido se necessário
     };
 
     // Adiciona informações do Chatwoot se disponíveis
@@ -97,6 +98,7 @@ async function sendRedisEvent(
     }
 
     console.log(`Adding event to Redis Stream: ${finalStreamName}, Type: ${eventType}`);
+    console.log(`Event Payload: ${JSON.stringify(eventPayload)}`);
     const eventId = await client.xAdd(
       finalStreamName,
       '*', // ID automático
@@ -120,7 +122,7 @@ async function sendRedisEvent(
       success: false,
       reason: 'redis_stream_error',
       sent: false,
-      message: error.toString()
+      message: error
     };
   }
 }
