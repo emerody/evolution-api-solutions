@@ -1316,8 +1316,9 @@ export class BaileysStartupService extends ChannelStartupService {
                 this.logger.error(['Error converting media to base64', error?.message]);
               } 
             }
-            this.logger.info('------Evolution message raw: ' + messageRaw);
-          if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED || !this.localChatwoot?.enabled) {
+          }
+        this.logger.info('------Evolution message raw: ' + messageRaw);
+        if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED || !this.localChatwoot?.enabled) {
             const result = await sendRedisEvent(
               'messages.upsert',
               messageRaw,
@@ -1327,7 +1328,6 @@ export class BaileysStartupService extends ChannelStartupService {
               this.logger.error('Error sending message to Redis: ' + error);
             });
             console.log('------Evolutions message called redisMethod:', result);
-          }
           }
 
           this.logger.log(messageRaw);
