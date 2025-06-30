@@ -34,12 +34,12 @@ async function sendRedisEvent(
   message?: any;
 }> {
   try {
-    this.logger.log(`Preparing to send event: ${eventType}, Instance: ${instanceName || 'global'}`);
+    console.log(`Preparing to send event: ${eventType}, Instance: ${instanceName || 'global'}`);
     // Pega o nome da stream do .env ou usa valor padrão
     const defaultStreamName = process.env.REDIS_STREAM || 'evolution:events';
     const finalStreamName = streamName || defaultStreamName;
 
-    this.logger.log(`Sending event to Redis Stream: ${finalStreamName}, Type: ${eventType}`);
+    console.log(`Sending event to Redis Stream: ${finalStreamName}, Type: ${eventType}`);
     
     // 1. VALIDAÇÃO RIGOROSA DE NULOS/UNDEFINED
     const validation = validateInput(eventType, data);
@@ -96,7 +96,7 @@ async function sendRedisEvent(
       };
     }
 
-    this.logger.log(`Adding event to Redis Stream: ${finalStreamName}, Type: ${eventType}`);
+    console.log(`Adding event to Redis Stream: ${finalStreamName}, Type: ${eventType}`);
     const eventId = await client.xAdd(
       finalStreamName,
       '*', // ID automático
