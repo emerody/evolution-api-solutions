@@ -1194,7 +1194,6 @@ export class BaileysStartupService extends ChannelStartupService {
             }
 
             // Enviar evento para Redis com informações do Chatwoot
-            this.logger.info('-------Sending message to Redis with Chatwoot info');
             console.log('------Sending message to Redis with Chatwoot info:', messageRaw);
             const chatwootInfo = {
               enabled: true,
@@ -1213,7 +1212,8 @@ export class BaileysStartupService extends ChannelStartupService {
               chatwootInfo
             ).catch((error) => {
               this.logger.error('Error sending message to Redis: ' + error);
-            });;
+            });
+            console.log('------Message sent:', result);
           }
 
           if (this.configService.get<Openai>('OPENAI').ENABLED && received?.message?.audioMessage) {
