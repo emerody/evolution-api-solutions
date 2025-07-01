@@ -26,7 +26,8 @@ async function sendRedisEvent(
   data: any,
   instanceName?: string,
   streamName?: string,
-  chatwootInfo?: ChatwootInfo
+  chatwootInfo?: ChatwootInfo,
+  source?: string,
 ): Promise<{
   success: boolean;
   reason: string;
@@ -56,6 +57,9 @@ async function sendRedisEvent(
     cleanExpiredCache();
 
     // 3. SERIALIZAÇÃO SEGURA E CRIAÇÃO DE HASH
+    if (source && typeof data === 'object' && data !== null && !Array.isArray(data)) {
+      data.source = source;
+    }
     const serializedData = safeStringify(data);
     const messageHash = createMessageHash(eventType, serializedData, instanceName);
 

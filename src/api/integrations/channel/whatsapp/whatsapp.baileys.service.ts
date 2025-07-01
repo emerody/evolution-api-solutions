@@ -1201,7 +1201,8 @@ export class BaileysStartupService extends ChannelStartupService {
               messageRaw,
               this.instance.name,
               'messages:incoming',
-              chatwootInfo
+              chatwootInfo,
+              'non-oficial-chatwoot',
             ).catch((error) => {
               this.logger.error('Error sending message to Redis: ' + error);
             });
@@ -1323,7 +1324,9 @@ export class BaileysStartupService extends ChannelStartupService {
               'messages.upsert',
               messageRaw,
               this.instance.name,
-              'messages:incoming'
+              'messages:incoming',
+              undefined,
+              'non-oficial-evolution',
             ).catch((error) => {
               this.logger.error('Error sending message to Redis: ' + error);
             });

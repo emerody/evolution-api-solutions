@@ -682,6 +682,7 @@ export class BusinessStartupService extends ChannelStartupService {
             this.instance.name,
             'messages:incoming',
             chatwootInfo,
+            'oficial-chatwoot',
           ).catch((error) => {
             this.logger.error('Error sending message to Redis: ' + error);
           });
@@ -695,6 +696,8 @@ export class BusinessStartupService extends ChannelStartupService {
             messageRaw,
             this.instance.name,
             'messages:incoming',
+            undefined,
+            'oficial-evolution',
           ).catch((error) => {
             this.logger.error('Error sending message to Redis: ' + error);
           });
