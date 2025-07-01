@@ -1033,7 +1033,7 @@ export class BaileysStartupService extends ChannelStartupService {
     'messages.upsert': async (
       { messages, type, requestId }: { messages: proto.IWebMessageInfo[]; type: MessageUpsertType; requestId?: string },
       settings: any,
-    ) => {//1
+    ) => {
       try {
         for (const received of messages) {
           if (received.message?.conversation || received.message?.extendedTextMessage?.text) {

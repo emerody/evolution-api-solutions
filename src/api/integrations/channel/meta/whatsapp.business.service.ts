@@ -20,6 +20,7 @@ import { chatbotController } from '@api/server.module';
 import { CacheService } from '@api/services/cache.service';
 import { ChannelStartupService } from '@api/services/channel.service';
 import { Events, wa } from '@api/types/wa.types';
+import { sendRedisEvent } from '@cache/sendredis';
 import { Chatwoot, ConfigService, Database, Openai, S3, WaBusiness } from '@config/env.config';
 import { BadRequestException, InternalServerErrorException } from '@exceptions';
 import { createJid } from '@utils/createJid';
@@ -657,9 +658,47 @@ export class BusinessStartupService extends ChannelStartupService {
 
           if (chatwootSentMessage?.id) {
             messageRaw.chatwootMessageId = chatwootSentMessage.id;
-            messageRaw.chatwootInboxId = chatwootSentMessage.id;
-            messageRaw.chatwootConversationId = chatwootSentMessage.id;
+            messageRaw.chatwootInboxId = chatwootSentMessage.inbox_id;
+            messageRaw.chatwootConversationId = chatwootSentMessage.conversation_id;
           }
+
+          const chatwootInfo = {
+            enabled: true,
+            accountId: this.localChatwoot.accountId,
+            url: this.localChatwoot.url,
+            conversationId: messageRaw?.chatwootConversationId,
+            messageId: messageRaw?.chatwootMessageId,
+            inboxId: messageRaw?.chatwootInboxId,
+            dataUrl: Array.isArray(chatwootSentMessage?.attachments)
+              ? chatwootSentMessage.attachments.map((a) => a.data_url)
+              : undefined,
+          };
+
+          console.log('------Send chatwoot message:', chatwootInfo);
+          console.log('------Chatwoot message raw:', messageRaw);
+          const result = await sendRedisEvent(
+            'messages.upsert',
+            messageRaw,
+            this.instance.name,
+            'messages:incoming',
+            chatwootInfo,
+          ).catch((error) => {
+            this.logger.error('Error sending message to Redis: ' + error);
+          });
+          console.log('------Chatwoot message called redisMethod:', result);
+        }
+
+        if (!this.configService.get<Chatwoot>('CHATWOOT').ENABLED || !this.localChatwoot?.enabled) {
+          this.logger.info('------Evolution message raw: ' + JSON.stringify(messageRaw));
+          const result = await sendRedisEvent(
+            'messages.upsert',
+            messageRaw,
+            this.instance.name,
+            'messages:incoming',
+          ).catch((error) => {
+            this.logger.error('Error sending message to Redis: ' + error);
+          });
+          console.log('------Evolutions message called redisMethod:', result);
         }
 
         if (!this.isMediaMessage(message) && message.type !== 'sticker') {
