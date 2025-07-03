@@ -1184,6 +1184,7 @@ export class BaileysStartupService extends ChannelStartupService {
 
             const chatwootInfo = {
               enabled: true,
+              contactId: chatwootSentMessage?.contact_id,
               accountId: this.localChatwoot.accountId,
               url: this.localChatwoot.url,
               conversationId: messageRaw?.chatwootConversationId,
