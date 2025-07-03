@@ -10,7 +10,6 @@ const CACHE_TTL = 300000; // 5 minutos
 interface ChatwootInfo {
   enabled?: boolean;
   accountId?: string;
-  contactId?: string; // Pode ser null ou undefined
   url?: string;
   conversationId?: string;
   messageId?: string;
@@ -87,7 +86,6 @@ async function sendRedisEvent(
       eventPayload.chatwoot = JSON.stringify({
         accountId: chatwootInfo.accountId,
         url: chatwootInfo.url,
-        contactId: chatwootInfo?.contactId || null,
         conversationId: chatwootInfo.conversationId,
         messageId: chatwootInfo.messageId,
         inboxId: chatwootInfo.inboxId,
